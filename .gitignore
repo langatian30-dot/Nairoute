@@ -1,0 +1,63 @@
+# ==========================================================
+# SAFEROUTE .gitignore
+# ==========================================================
+
+# ------------------------------------------------------
+# Python
+# ------------------------------------------------------
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+
+# ------------------------------------------------------
+# Virtual environment
+# ------------------------------------------------------
+venv/
+env/
+.venv/
+
+# ------------------------------------------------------
+# Large data / model files
+# ------------------------------------------------------
+# These are too large for a normal git repo (risk_model.joblib
+# alone exceeds GitHub's 100MB per-file limit). Regenerate them
+# locally via download_graph.py / prepare_graph.py / train_model.py,
+# or host them externally (e.g. a release asset, cloud storage,
+# or Git LFS) and download at deploy time instead of committing.
+*.graphml
+*.joblib
+*.csv
+
+# osmnx's local cache of downloaded OpenStreetMap API responses
+cache/
+
+# Placeholder file/folder from the original project structure
+data
+data/
+models
+models/
+
+# ------------------------------------------------------
+# Streamlit
+# ------------------------------------------------------
+.streamlit/secrets.toml
+
+# ------------------------------------------------------
+# Editor / OS junk
+# ------------------------------------------------------
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# ------------------------------------------------------
+# Backups / temporary debugging scripts
+# ------------------------------------------------------
+*.bak
+check_indent.py
+fix_indent.py
+find_unclosed.py
+add_debug.py
