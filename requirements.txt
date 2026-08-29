@@ -11,3 +11,4 @@ joblib
 plotly
 geopy
 pyproj
+huggingface_hub

@@ -27,7 +27,7 @@ GRAPH_FILE = "nairobi_graph.graphml"
 MODEL_FILE = "risk_model.joblib"
 
 GEOCODER = Nominatim(
-    user_agent="SafeRouteAI",
+    user_agent="NaiRouteAI",
     timeout=10
 )
 
@@ -117,18 +117,63 @@ def clean_lanes_label(lanes):
 
 
 # ==========================================================
+# HUGGING FACE HUB CONFIG
+# ==========================================================
+# The road graph and trained model are too large for a normal
+# git repository (the model alone exceeds GitHub's 100MB limit).
+# They're hosted on Hugging Face Hub instead and downloaded
+# automatically the first time the app runs, if not already
+# present locally. This keeps the git repo lightweight while
+# still working seamlessly for local development (where the
+# files already exist and are used as-is, no download needed).
+
+HF_REPO_ID = "Ianoo412/Nairoute-data"
+
+
+def _ensure_file_available(local_path, hf_filename):
+    """
+    Returns a usable local path to the given file, downloading
+    it from Hugging Face Hub first if it isn't already present
+    on disk (e.g. on a fresh deployment).
+    """
+
+    if os.path.exists(local_path):
+        return local_path
+
+    try:
+
+        from huggingface_hub import hf_hub_download
+
+        downloaded_path = hf_hub_download(
+            repo_id=HF_REPO_ID,
+            filename=hf_filename,
+            repo_type="dataset",
+        )
+
+        return downloaded_path
+
+    except Exception as e:
+
+        raise FileNotFoundError(
+            f"Could not find '{local_path}' locally, and "
+            f"downloading it from Hugging Face Hub also "
+            f"failed: {e}"
+        )
+
+
+# ==========================================================
 # LOAD AI MODEL
 # ==========================================================
 
 @st.cache_resource
 def load_model():
 
-    if not os.path.exists(MODEL_FILE):
-        raise FileNotFoundError(
-            f"Cannot find {MODEL_FILE}"
-        )
+    model_path = _ensure_file_available(
+        MODEL_FILE,
+        MODEL_FILE,
+    )
 
-    return joblib.load(MODEL_FILE)
+    return joblib.load(model_path)
 
 
 # ==========================================================
@@ -138,12 +183,12 @@ def load_model():
 @st.cache_resource
 def load_graph():
 
-    if not os.path.exists(GRAPH_FILE):
-        raise FileNotFoundError(
-            f"Cannot find {GRAPH_FILE}"
-        )
+    graph_path = _ensure_file_available(
+        GRAPH_FILE,
+        GRAPH_FILE,
+    )
 
-    return ox.load_graphml(GRAPH_FILE)
+    return ox.load_graphml(graph_path)
 
 
 # ==========================================================
@@ -212,7 +257,7 @@ def validate_location_within_range(
     if distance_km > max_km:
 
         raise ValueError(
-            f"{label} appears to be outside the SafeRoute "
+            f"{label} appears to be outside the NaiRoute "
             f"Nairobi road network (~{distance_km:.0f} km "
             "away). Please enter a location within Nairobi."
         )
@@ -396,7 +441,7 @@ def get_nearest_nodes(G, start_location, destination):
 
             raise ValueError(
                 "Start location is too far from the "
-                "SafeRoute road network. Please enter a "
+                "NaiRoute road network. Please enter a "
                 "more specific location within Nairobi."
             )
 
@@ -404,7 +449,7 @@ def get_nearest_nodes(G, start_location, destination):
 
             raise ValueError(
                 "Destination is too far from the "
-                "SafeRoute road network. Please enter a "
+                "NaiRoute road network. Please enter a "
                 "more specific location within Nairobi."
             )
 
@@ -901,7 +946,7 @@ def generate_route_explanation(
     safest_breakdown
 ):
     """
-    Builds a natural-language explanation of SafeRoute's
+    Builds a natural-language explanation of NaiRoute's
     routing decision, using only values already produced
     by the existing risk model and route calculations.
 
@@ -1605,7 +1650,7 @@ def create_route_map(
 
     folium.PolyLine(
         locations=safest_points,
-        color="green",
+        color="#8e44ad",
         weight=7,
         opacity=0.9,
         tooltip="🛡️ Safest Route",
@@ -1685,7 +1730,7 @@ def create_route_map(
         <span style="color:blue;">━</span>
         Shortest<br>
 
-        <span style="color:green;">━</span>
+        <span style="color:#8e44ad;">━</span>
         Safest
     </div>
     """

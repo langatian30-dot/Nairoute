@@ -1,5 +1,5 @@
 # ==========================================================
-# SAFEROUTE V4.0
+# NAIROUTE V4.0
 # app.py
 # ==========================================================
 
@@ -26,7 +26,7 @@ from utils import (
 # ==========================================================
 
 st.set_page_config(
-    page_title="SafeRoute",
+    page_title="NaiRoute",
     page_icon="🛡️",
     layout="wide",
 )
@@ -36,7 +36,7 @@ st.set_page_config(
 # TITLE
 # ==========================================================
 
-st.title("🛡️ SafeRoute")
+st.title("🛡️ NaiRoute")
 
 st.markdown(
     """
@@ -103,6 +103,63 @@ with st.sidebar:
         use_container_width=True,
         key="calculate_safe_route",
     )
+
+    st.markdown("---")
+
+    with st.expander("ℹ️ About NaiRoute & Data Limitations"):
+
+        st.markdown(
+            """
+**What NaiRoute does**
+
+NaiRoute predicts relative road-segment risk using a
+machine learning model, and suggests a route that
+trades off distance against that predicted risk. All
+risk figures shown ("Predicted risk: High", risk
+scores, hotspots) are **model predictions**, not
+confirmed facts about any specific road or incident.
+
+**Data sources**
+- Road network: OpenStreetMap (via `osmnx`)
+- Crime risk input: a manually curated list of ~10
+  Nairobi areas with subjective risk ratings (1–5),
+  not official crime statistics or police records
+
+**Update frequency**
+
+Data is static — captured at development time and not
+automatically refreshed. Road conditions, incident
+patterns, and infrastructure can change without
+NaiRoute reflecting it.
+
+**Model limitations**
+- Trained on a synthetic risk dataset combining road
+  characteristics with the manually rated crime areas
+  above, not on verified real-world incident records
+- Coverage and accuracy vary by area, especially
+  outside the ~10 rated hotspot zones
+- Predictions reflect patterns in the training data,
+  not a guarantee about any specific trip
+
+**Geographic coverage**
+
+Nairobi, Kenya only. Locations outside this area are
+rejected.
+
+**Privacy**
+
+NaiRoute does not collect or store personal data.
+Route history shown in this session lives only in
+your browser session and is cleared when you close
+the app or click "Clear Route History."
+
+**Bottom line**
+
+Use NaiRoute's risk predictions as one input among
+others, not as a substitute for your own judgment,
+local knowledge, or official safety guidance.
+"""
+        )
 
 
 # ==========================================================
@@ -337,7 +394,7 @@ if calculate_route:
 
         except ValueError as e:
 
-            # ValueErrors raised by SafeRoute's own validation
+            # ValueErrors raised by NaiRoute's own validation
             # (invalid location, same start/destination, too
             # far from the road network, etc.) already carry a
             # clear, user-facing message — show it directly
@@ -697,7 +754,7 @@ if st.session_state.get("results") is not None:
 
     st.markdown(
         """
-        SafeRoute analyses the road segments used by each route
+        NaiRoute analyses the road segments used by each route
         and identifies the overall hazard level for the selected
         travel period.
         """
@@ -833,9 +890,9 @@ if st.session_state.get("results") is not None:
     if safest_hotspots:
 
         st.warning(
-            f"🚨 {len(safest_hotspots)} hazard hotspot"
+            f"🚨 {len(safest_hotspots)} predicted hazard hotspot"
             f"{'s' if len(safest_hotspots) != 1 else ''} "
-            "detected along the recommended route."
+            "along the recommended route."
         )
 
         for i, hotspot in enumerate(safest_hotspots, start=1):
@@ -854,7 +911,7 @@ if st.session_state.get("results") is not None:
                 )
 
                 st.write(
-                    f"- 🤖 Risk: **{hotspot['risk']:.2f}**"
+                    f"- 🤖 Predicted risk: **{hotspot['risk']:.2f}**"
                 )
 
                 st.write(
@@ -873,7 +930,7 @@ if st.session_state.get("results") is not None:
     else:
 
         st.success(
-            "🟢 No significant hazard hotspots detected "
+            "🟢 No significant hazard hotspots predicted "
             "along the recommended route."
         )
 
@@ -953,7 +1010,7 @@ if st.session_state.get("results") is not None:
     # ======================================================
 
     with st.expander(
-        "🔍 Why did SafeRoute choose this route?"
+        "🔍 Why did NaiRoute choose this route?"
     ):
 
         st.write(
@@ -995,7 +1052,7 @@ if st.session_state.get("results") is not None:
     # SAFEROUTE ANALYTICS DASHBOARD
     # ======================================================
 
-    st.subheader("📊 SafeRoute Analytics")
+    st.subheader("📊 NaiRoute Analytics")
 
     # ------------------------------------------------------
     # DASHBOARD METRICS
@@ -1081,7 +1138,7 @@ if st.session_state.get("results") is not None:
 
         st.success(
             """
-            🛡️ **SafeRoute recommends the Safest Route.**
+            🛡️ **NaiRoute recommends the Safest Route.**
 
             The alternative route provides a meaningful reduction
             in predicted road risk without an excessive increase
@@ -1093,7 +1150,7 @@ if st.session_state.get("results") is not None:
 
         st.info(
             """
-            🚗 **SafeRoute recommends the Shortest Route.**
+            🚗 **NaiRoute recommends the Shortest Route.**
 
             The additional distance required by the safer route
             is not sufficiently justified by the predicted safety
@@ -1216,7 +1273,7 @@ else:
         )
 
         st.write(
-            "SafeRoute will show you the shortest route, the "
+            "NaiRoute will show you the shortest route, the "
             "predicted-safest route, and explain the trade-off "
             "between them."
         )
@@ -1232,7 +1289,7 @@ else:
     with welcome_col2:
 
         st.info(
-            "**What SafeRoute shows you:**\n\n"
+            "**What NaiRoute shows you:**\n\n"
             "🚗 Shortest route\n\n"
             "🛡️ Predicted-safest route\n\n"
             "🚨 Hazard hotspots along the way\n\n"
@@ -1241,7 +1298,7 @@ else:
         )
 
     st.caption(
-        "SafeRoute currently covers Nairobi, Kenya only. "
+        "NaiRoute currently covers Nairobi, Kenya only. "
         "Predicted risk is based on a machine learning model "
         "trained on available road and crime data — it is a "
         "prediction, not a guarantee of safety."
